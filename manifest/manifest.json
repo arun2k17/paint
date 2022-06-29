@@ -1,0 +1,36 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+    "version": "1.0.0",
+    "manifestVersion": "1.12",
+    "id": "4e0ee51a-b660-4d47-b970-f46b6a576989",
+    "packageName": "com.paint",
+    "name": {
+        "short": "Paint app",
+        "full": "Paint app"
+    },
+    "developer": {
+        "name": "Arun",
+        "mpnId": "",
+        "websiteUrl": "https://www.example.com",
+        "privacyUrl": "https://www.example.com/PrivacyStatement",
+        "termsOfUseUrl": "https://www.example.com/TermsOfUse"
+    },
+    "description": {
+        "short": "Paint app",
+        "full": "Paint app"
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#FFFFFF",
+    "configurableTabs": [
+        {
+            "configurationUrl": "https://5653-50-35-112-158.ngrok.io/?view=config&inTeams=1&load=1",
+            "canUpdateConfiguration": false,
+            "scopes": ["groupchat"],
+            "context": ["meetingSidePanel", "meetingStage"]
+        }
+    ],
+    "validDomains": ["*.ngrok.io"]
+}

@@ -1,0 +1,32 @@
+{
+    "name": "teams-tab-app",
+    "version": "0.3.1",
+    "description": "Sample teams tab app",
+    "repository": "https://github.com/arun2k17/teamstabapp",
+    "license": "Arun",
+    "author": "Arun",
+    "scripts": {
+        "clean": "npx shx rm -rf dist",
+        "build": "webpack --env prod --env clean",
+        "build:dev": "webpack --env clean",
+        "start": "webpack serve --config webpack.config.js"
+    },
+    "dependencies": {
+        "@microsoft/teams-js": "2.0.0-experimental.0"
+    },
+    "devDependencies": {
+        "clean-webpack-plugin": "^3.0.0",
+        "concurrently": "^5.3.0",
+        "html-webpack-plugin": "^4.3.0",
+        "webpack": "4.44.2",
+        "webpack-cli": "^4.8.0",
+        "webpack-dev-server": "3.11.1"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": false,
+        "printWidth": 100
+    }
+}
