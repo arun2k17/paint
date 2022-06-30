@@ -1,8 +1,17 @@
 import { app, pages } from "@microsoft/teams-js";
 import { ge, assignIdChildren } from "./utils";
+import { SharedMap } from "fluid-framework";
+import { TeamsFluidClient } from "@microsoft/live-share";
+import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
+import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 
 const searchParams = new URL(window.location).searchParams;
 const root = document.getElementById("content");
+const containerSchema = {
+    initialObjects: {
+        colorsMap: SharedMap,
+    },
+};
 
 // STARTUP LOGIC
 
@@ -32,8 +41,41 @@ async function start() {
             break;
         case "stage":
         default:
-            renderStage(root);
+            const { container } = await joinContainer();
+            renderStage(root, container.initialObjects.colorsMap);
             break;
+    }
+}
+
+async function joinContainer() {
+    // Are we running in teams?
+    let client;
+    if (!!searchParams.get("inTeams")) {
+        // Create client
+        client = new TeamsFluidClient();
+    } else {
+        // Create client and configure for testing
+        client = new TeamsFluidClient({
+            connection: {
+                tenantId: LOCAL_MODE_TENANT_ID,
+                tokenProvider: new InsecureTokenProvider("", { id: "123", name: "Test User" }),
+                orderer: "http://localhost:7070",
+                storage: "http://localhost:7070",
+            },
+        });
+    }
+
+    // Join container
+    try {
+        const results = await client.joinContainer(
+            containerSchema,
+            /* onContainerFirstCreated */ (container) => {
+                console.log(container);
+            }
+        );
+        return results;
+    } catch (e) {
+        console.log(`error ${e}`);
     }
 }
 
@@ -68,13 +110,15 @@ stageTemplate["innerHTML"] = `
   </div>
 `;
 
-function renderStage(elem) {
+function renderStage(elem, colorsMap) {
     elem.appendChild(stageTemplate.content.cloneNode(true));
     ge("loadArtButton").addEventListener("click", () => {
         loadArt(ge("artCode").value);
     });
-    paint();
+    // paint();
+    paintTogether(colorsMap);
 }
+
 function loadArt(code) {
     const art = ge("art");
     art.innerHTML = code;
@@ -89,6 +133,36 @@ function paint() {
             event.srcElement.style.fill = color;
         }
     });
+}
+
+function paintTogether(colorsMap) {
+    const paint = (color, id) => {
+        const artElement = ge(id);
+        console.log(`${id} ${artElement}`);
+        artElement.style.fill = color;
+    };
+    const setStateFn = createSharedStateCollection(colorsMap, "artElement", paint);
+    document.addEventListener("click", (event) => {
+        console.log(event);
+        if (event.srcElement.id.indexOf("artElement") === 0) {
+            const color = ge("color").value;
+            setStateFn(color, event.srcElement.id);
+        }
+    });
+}
+
+function createSharedStateCollection(map, collectionKey, onChange) {
+    const isValidKey = (changedKey) => changedKey.indexOf(collectionKey) === 0;
+
+    map.on("valueChanged", (...args) => {
+        const changedKey = args[0].key;
+        if (isValidKey(changedKey)) {
+            onChange(map.get(changedKey), changedKey);
+        }
+    });
+    return (value, key) => {
+        map.set(key, value);
+    };
 }
 // SIDEBAR VIEW
 
@@ -130,8 +204,8 @@ function renderSettings(elem) {
         pages.config.setConfig({
             websiteUrl: window.location.origin,
             contentUrl: window.location.origin + "?inTeams=1&view=content",
-            entityId: "TeamsTabApp",
-            suggestedDisplayName: "TeamsTabApp",
+            entityId: "Paint live share",
+            suggestedDisplayName: "Paint live share",
         });
         saveEvent.notifySuccess();
     });

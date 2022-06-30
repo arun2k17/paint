@@ -2,11 +2,11 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
     "version": "1.0.0",
     "manifestVersion": "1.12",
-    "id": "4e0ee51a-b660-4d47-b970-f46b6a576989",
+    "id": "69309c5b-8062-413f-95b9-9561ca60aadd",
     "packageName": "com.paint",
     "name": {
-        "short": "Paint app",
-        "full": "Paint app"
+        "short": "Paint live share app",
+        "full": "Paint live share app"
     },
     "developer": {
         "name": "Arun",
@@ -32,5 +32,28 @@
             "context": ["meetingSidePanel", "meetingStage"]
         }
     ],
-    "validDomains": ["*.ngrok.io"]
+    "validDomains": ["*.ngrok.io"],
+    "authorization": {
+        "permissions": {
+            "orgWide": [],
+            "resourceSpecific": [
+                {
+                    "name": "MeetingStage.Write.Chat",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "ChannelMeetingStage.Write.Group",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "LiveShareSession.ReadWrite.Chat",
+                    "type": "Delegated"
+                },
+                {
+                    "name": "LiveShareSession.ReadWrite.Group",
+                    "type": "Delegated"
+                }
+            ]
+        }
+    }
 }
